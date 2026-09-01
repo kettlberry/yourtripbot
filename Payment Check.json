@@ -1,0 +1,501 @@
+{
+  "name": "Payment Check",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "payment-check",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "8f3ad56c-315f-4588-a808-e605327577ea",
+      "name": "Payment Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -496,
+        -32
+      ],
+      "webhookId": "payment-check-webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"ok\" }",
+        "options": {}
+      },
+      "id": "bd38dc9e-4553-4356-b5f2-6cdd9d4309d1",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -272,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "11y3qpxto4vKeNbeyswPu8L17fpnr_hBRKNUOREkKX_w",
+          "mode": "list",
+          "cachedResultName": "Заявки",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11y3qpxto4vKeNbeyswPu8L17fpnr_hBRKNUOREkKX_w/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11y3qpxto4vKeNbeyswPu8L17fpnr_hBRKNUOREkKX_w/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "ID заявки",
+              "lookupValue": "={{ $json.body.booking_id }}"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "id": "a8fefe68-c20b-4a64-9452-0fd26ca231a9",
+      "name": "Find Booking in Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -272,
+        -32
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "J8yow7e2dfHWVy5F",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "calc-001",
+              "name": "booking_id",
+              "value": "={{ $('Payment Webhook').item.json.body.booking_id }}",
+              "type": "string"
+            },
+            {
+              "id": "calc-002",
+              "name": "paid_amount",
+              "value": "={{ parseFloat($('Payment Webhook').item.json.body.paid_amount) }}",
+              "type": "number"
+            },
+            {
+              "id": "calc-003",
+              "name": "tg_id",
+              "value": "={{ $('Payment Webhook').item.json.body.tg_id }}",
+              "type": "string"
+            },
+            {
+              "id": "calc-004",
+              "name": "total_price",
+              "value": "={{ parseFloat(String($json['Итоговая стоимость']).replace(/[^\\d.]/g, '')) }}",
+              "type": "number"
+            },
+            {
+              "id": "calc-005",
+              "name": "already_paid",
+              "value": "={{ parseFloat(String($json['Оплачено'] || '0').replace(/[^\\d.]/g, '')) || 0 }}",
+              "type": "number"
+            },
+            {
+              "id": "calc-006",
+              "name": "excursion_name",
+              "value": "={{ $json['Экскурсия'] }}",
+              "type": "string"
+            },
+            {
+              "id": "calc-007",
+              "name": "client_name",
+              "value": "={{ $json['ФИО клиента'] }}",
+              "type": "string"
+            },
+            {
+              "id": "calc-008",
+              "name": "new_paid_total",
+              "value": "={{ (parseFloat(String($json['Оплачено'] || '0').replace(/[^\\d.]/g, '')) || 0) + parseFloat($('Payment Webhook').item.json.body.paid_amount) }}",
+              "type": "number"
+            },
+            {
+              "id": "calc-009",
+              "name": "row_number",
+              "value": "={{ $json['row_number'] || $json['_rowNumber'] }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9304ac95-3670-43fb-81de-c608c8d73f94",
+      "name": "Calculate Payment",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -64,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "check-001",
+              "leftValue": "={{ $json.new_paid_total }}",
+              "rightValue": "={{ $json.total_price }}",
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "74865e7e-f39c-4d6b-a1dd-3d0a7fd07685",
+      "name": "Fully Paid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        128,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "11y3qpxto4vKeNbeyswPu8L17fpnr_hBRKNUOREkKX_w",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID заявки": "={{ $json.booking_id }}",
+            "Статус заявки": "Оплачено",
+            "Оплачено": "={{ $json.new_paid_total }} ₽"
+          },
+          "matchingColumns": [
+            "ID заявки"
+          ],
+          "schema": [
+            {
+              "id": "ID заявки",
+              "displayName": "ID заявки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Статус заявки",
+              "displayName": "Статус заявки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Оплачено",
+              "displayName": "Оплачено",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "edd55ea5-03f8-463a-bb22-130af60f2b78",
+      "name": "Update Status → Оплачено",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        352,
+        -176
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "J8yow7e2dfHWVy5F",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "11y3qpxto4vKeNbeyswPu8L17fpnr_hBRKNUOREkKX_w",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID заявки": "={{ $json.booking_id }}",
+            "Статус заявки": "Частичная оплата",
+            "Оплачено": "={{ $json.new_paid_total }} ₽"
+          },
+          "matchingColumns": [
+            "ID заявки"
+          ],
+          "schema": [
+            {
+              "id": "ID заявки",
+              "displayName": "ID заявки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Статус заявки",
+              "displayName": "Статус заявки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Оплачено",
+              "displayName": "Оплачено",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ac9b97bf-e916-43b1-96a8-2befa70a2f96",
+      "name": "Update Status → Частичная оплата",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        352,
+        112
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "J8yow7e2dfHWVy5F",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Calculate Payment').item.json.tg_id }}",
+        "text": "=Оплата зафиксирована ✅\n\nВаша экскурсия *{{ $('Calculate Payment').item.json.excursion_name }}* забронирована.\n\nВ течение часа на указанный номер будут отправлены электронные билеты и детали поездки.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "8176afb5-47d5-4530-933f-024511b2bc3a",
+      "name": "Send Success Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        544,
+        -176
+      ],
+      "webhookId": "c2bdee3c-33c5-450b-9531-34b2e8e33139",
+      "credentials": {
+        "telegramApi": {
+          "id": "umKPzJRTgyHpRONL",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Calculate Payment').item.json.tg_id }}",
+        "text": "=Получили оплату на сумму *{{ $('Calculate Payment').item.json.paid_amount }} ₽* ✅\n\nНо заявка оплачена не полностью:\n• Стоимость: *{{ $('Calculate Payment').item.json.total_price }} ₽*\n• Оплачено: *{{ $('Calculate Payment').item.json.new_paid_total }} ₽*\n• Остаток: *{{ $('Calculate Payment').item.json.total_price - $('Calculate Payment').item.json.new_paid_total }} ₽*\n\nДля доплаты перейдите по ссылке ниже 👇",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "bf531890-f410-4eda-b441-07236bfe4034",
+      "name": "Send Partial Payment Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        112
+      ],
+      "webhookId": "9ebef9b8-857e-4a1b-8c2e-e87064d3c97c",
+      "credentials": {
+        "telegramApi": {
+          "id": "umKPzJRTgyHpRONL",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Calculate Payment').item.json.tg_id }}",
+        "text": "=https://kettlberry.github.io/index/?amount={{ $('Calculate Payment').item.json.total_price - $('Calculate Payment').item.json.new_paid_total }}&booking_id={{ $('Calculate Payment').item.json.booking_id }}&tg_id={{ $('Calculate Payment').item.json.tg_id }}&excursion={{ encodeURIComponent($('Calculate Payment').item.json.excursion_name) }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "db2aafd1-8d22-40f5-a200-b5622576513f",
+      "name": "Send Remaining Payment Link",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        112
+      ],
+      "webhookId": "cbf2d735-cd08-4a08-ada4-9da6f119c437",
+      "credentials": {
+        "telegramApi": {
+          "id": "umKPzJRTgyHpRONL",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Payment Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Find Booking in Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Booking in Sheets": {
+      "main": [
+        [
+          {
+            "node": "Calculate Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Payment": {
+      "main": [
+        [
+          {
+            "node": "Fully Paid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fully Paid?": {
+      "main": [
+        [
+          {
+            "node": "Update Status → Оплачено",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Status → Частичная оплата",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status → Оплачено": {
+      "main": [
+        [
+          {
+            "node": "Send Success Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status → Частичная оплата": {
+      "main": [
+        [
+          {
+            "node": "Send Partial Payment Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Partial Payment Message": {
+      "main": [
+        [
+          {
+            "node": "Send Remaining Payment Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4bd7804b-26e7-4a9b-bbb5-f9c2d7f9efaa",
+  "meta": {
+    "instanceId": "82a9c5e7fb3e72f3077770c7372d4c1dcf31d5f805e8ecc2556f4381083ca5a2"
+  },
+  "id": "ADoqdhUFjSfPLuSc",
+  "tags": []
+}

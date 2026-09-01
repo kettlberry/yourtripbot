@@ -1,0 +1,349 @@
+{
+  "name": "Booking Tool",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "11y3qpxto4vKeNbeyswPu8L17fpnr_hBRKNUOREkKX_w",
+          "mode": "list",
+          "cachedResultName": "Заявки",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11y3qpxto4vKeNbeyswPu8L17fpnr_hBRKNUOREkKX_w/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11y3qpxto4vKeNbeyswPu8L17fpnr_hBRKNUOREkKX_w/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID заявки": "={{ Date.now() }}",
+            "Дата создания": "={{ new Date().toLocaleString(\"ru-RU\", { timeZone: \"Europe/Moscow\" }) }}",
+            "Telegram ID": "={{ $json.telegram_user_id || \"\" }}",
+            "Username": "={{ $json.telegram_username || \"\" }}",
+            "ФИО клиента": "={{ $json.client_name }}",
+            "Телефон": "={{ $json.phone }}",
+            "Экскурсия": "={{ $json.excursion_name }}",
+            "Дата экскурсии": "={{ $json.date }}",
+            "Количество участников": "={{ $json.participants }}",
+            "Состав участников": "={{ $json.participants_details || \"\" }}",
+            "Итоговая стоимость": "={{ $json.total_price }}",
+            "Комментарий": "={{ $json.comment || \"\" }}",
+            "Статус заявки": "Ожидает оплаты"
+          },
+          "matchingColumns": [
+            "ID заявки"
+          ],
+          "schema": [
+            {
+              "id": "ID заявки",
+              "displayName": "ID заявки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Дата создания",
+              "displayName": "Дата создания",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Telegram ID",
+              "displayName": "Telegram ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Username",
+              "displayName": "Username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ФИО клиента",
+              "displayName": "ФИО клиента",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Телефон",
+              "displayName": "Телефон",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Экскурсия",
+              "displayName": "Экскурсия",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Дата экскурсии",
+              "displayName": "Дата экскурсии",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Количество участников",
+              "displayName": "Количество участников",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Состав участников",
+              "displayName": "Состав участников",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Итоговая стоимость",
+              "displayName": "Итоговая стоимость",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Статус заявки",
+              "displayName": "Статус заявки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Оплачено",
+              "displayName": "Оплачено",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Комментарий",
+              "displayName": "Комментарий",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "955b91c4-830b-4f8a-9832-1f990bfb5186",
+      "name": "Append booking to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1280,
+        672
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "J8yow7e2dfHWVy5F",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "client_name"
+            },
+            {
+              "name": "phone"
+            },
+            {
+              "name": "excursion_name"
+            },
+            {
+              "name": "date"
+            },
+            {
+              "name": "participants"
+            },
+            {
+              "name": "total_price"
+            },
+            {
+              "name": "participants_details"
+            },
+            {
+              "name": "comment"
+            },
+            {
+              "name": "telegram_user_id"
+            },
+            {
+              "name": "telegram_username"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1104,
+        672
+      ],
+      "id": "3c0e923e-e94f-487c-be9f-776e6a8247a8",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "chatId": "1294110247",
+        "text": "=🔔 **Новая заявка на экскурсию!**\nID заявки: {{ $json[\"ID заявки\"] }}\n\n👤 ФИО: {{ $json[\"ФИО клиента\"] }}\n📞 Телефон: {{ $json[\"Телефон\"] }}\n🗺 Экскурсия: {{ $json[\"Экскурсия\"] }}\n📅 Дата: {{ $json[\"Дата экскурсии\"] }}\n👥 Участники: {{ $json[\"Количество участников\"] }}\n💰 К оплате: {{ $json[\"Итоговая стоимость\"] }}\n💬 Комментарий: {{ $json[\"Комментарий\"] }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1392,
+        480
+      ],
+      "id": "23e05025-a59a-436c-9f9c-2283fa110188",
+      "name": "Send a text message",
+      "webhookId": "a9123bf1-ff6f-4ecf-9e08-3d343e32556b",
+      "credentials": {
+        "telegramApi": {
+          "id": "umKPzJRTgyHpRONL",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2d1a3b4c-5e6f-7g8h-9i0j-1k2l3m4n5o6p",
+              "name": "reply",
+              "value": "=Заявка сформирована ✅\n\nДанные брони:\nЭкскурсия — {{ $json['Экскурсия'] || '' }}\nДата — {{ $json['Дата экскурсии'] || '' }}\nУчастники — {{ $json['Количество участников'] || '' }}\nФИО — {{ $json['ФИО клиента'] || '' }}\nТелефон — {{ $json['Телефон'] || '' }}\nИтог — {{ $json['Итоговая стоимость'] || '' }} ₽\n\nСсылка на оплату: <a href=\"https://kettlberry.github.io/html/?amount={{ String($json['Итоговая стоимость'] || '').replace(/[^\\d]/g, '') }}&booking_id={{ $json['ID заявки'] || '' }}&tg_id={{ $json['Telegram ID'] || '' }}&excursion={{ encodeURIComponent($json['Экскурсия'] || '') }}\">Оплатить экскурсию</a>\n\nПосле оплаты вернитесь в этот чат.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "55b93bfa-92f6-4fb0-af8e-e84d5b3df4bb",
+      "name": "Set Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1456,
+        672
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Append booking to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Set Response",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Append booking to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Set Response": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "61348d65-0cba-4f59-81fa-8598e476ee96",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "82a9c5e7fb3e72f3077770c7372d4c1dcf31d5f805e8ecc2556f4381083ca5a2"
+  },
+  "id": "C6zFruHLusDieFRe",
+  "tags": []
+}
